@@ -1,0 +1,8 @@
+node_modules
+admin/node_modules
+dist
+admin/dist
+.npm-cache
+admin/.npm-cache
+.env
+backups

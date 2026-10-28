@@ -1,0 +1,33 @@
+{
+  "name": "dungeonmaster-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "worker": "node dist/worker.js",
+    "build": "tsc -p tsconfig.json",
+    "migrate": "node dist/migrate.js",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^10.1.8",
+    "@modelcontextprotocol/node": "^2.1.2",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "fastify": "^5.6.0",
+    "pg": "^8.16.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.12",
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@types/node": "^24.7.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.1"
+  }
+}

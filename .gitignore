@@ -1,0 +1,8 @@
+node_modules/
+dist/
+admin/dist/
+.env
+*.log
+backups/
+.npm-cache/
+admin/.npm-cache/
