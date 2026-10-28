@@ -9,8 +9,8 @@ const chunkSize=32768;
 const obj=z.record(z.string(),z.unknown());
 const imported=z.object({format:z.literal('dungeonmaster-world-v1'),snapshot:z.object({
   world:z.object({name:z.string().min(1).max(100),owner_id:z.string().min(1),status:z.enum(['setup','active','archived']),settings:obj,state:obj}),
-  members:z.array(z.object({user_id:z.string().min(1),ready:z.boolean(),active:z.boolean(),role:z.string(),preference:obj})).min(1).max(8),
-  characters:z.array(z.object({id:z.uuid(),user_id:z.string(),name:z.string().min(1).max(80),sheet:obj})).max(8),
+  members:z.array(z.object({user_id:z.string().min(1),ready:z.boolean(),active:z.boolean(),role:z.string(),preference:obj})).min(1).max(10),
+  characters:z.array(z.object({id:z.uuid(),user_id:z.string(),name:z.string().min(1).max(80),sheet:obj})).max(10),
   story:z.object({public:obj,private:obj}).nullable(),
   npcs:z.array(z.object({id:z.uuid(),name:z.string(),visibility:z.enum(['public','private']),data:obj})).max(200),
   quests:z.array(z.object({id:z.uuid(),name:z.string(),visibility:z.enum(['public','private']),data:obj})).max(200),

@@ -72,7 +72,7 @@ Worker 单独运行：`npm run worker`。测试：`npm test`。`ADMIN_PASSWORD` 
 
 这些值必须来自 QQ 平台事件或受信任的接入层，不得由聊天文本或模型工具参数指定。MCP Key 代表机器人权限，QQ 发言人身份代表玩家权限，两层验证分别执行。Key 还须在后台绑定目标 QQ 群。若现有客户端只能由模型填写参数、不能注入可信发言人请求头，无法安全执行玩家角色、房主或存档操作；需在已有 QQ AI 的 MCP 接入层补齐上述字段。服务端不会自行读取 QQ 消息。
 
-一个群可创建多个世界，房主通过 `select_active_world` 切换活跃世界。玩家各自使用真实 QQ 身份调用 `join_world` 后直接加入，无需房主批准，再调用 `create_character`、`set_player_ready`。战斗进行中暂不能加入。`leave_world` 将玩家标记为离线并保留角色和名额，重新调用 `join_world` 可回到原角色；房主移除成员会释放名额。2–8 人全部准备后房主调用 `start_campaign`。`get_group_context` 和 `get_recent_events` 可在 QQ AI 重启后恢复进度。
+一个群可创建多个世界，房主通过 `select_active_world` 切换活跃世界。玩家各自使用真实 QQ 身份调用 `join_world` 后直接加入，无需房主批准，再调用 `create_character`、`set_player_ready`。战斗进行中暂不能加入。`leave_world` 将玩家标记为离线并保留角色和名额，重新调用 `join_world` 可回到原角色；房主移除成员会释放名额。2–10 人全部准备后房主调用 `start_campaign`。`get_group_context` 和 `get_recent_events` 可在 QQ AI 重启后恢复进度。
 
 MCP 工具只返回数据，不向 QQ 群发消息。群内发布内容由 QQ AI 决定。`get_dm_story_context` 返回 DM 私有资料，不能原样转发到群聊。
 

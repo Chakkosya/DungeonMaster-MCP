@@ -23,7 +23,7 @@ export function createMcpServer(actor: Actor) {
   const add=(name:string,description:string,schema:any,fn:(a:any)=>Promise<unknown>)=>{
     server.registerTool(name,{description,inputSchema:schema},async (a:any)=>{try{return success(await fn(a));}catch(e){await pool.query('UPDATE api_keys SET error_count=error_count+1 WHERE id=$1',[actor.keyId]);return error(e);}});
   };
-  add('get_server_info','服务器和功能信息',z.object({}),async()=>({name:'DungeonMaster MCP',version:'0.1.0',players:'2–8',autosaves:3}));
+  add('get_server_info','服务器和功能信息',z.object({}),async()=>({name:'DungeonMaster MCP',version:'0.1.0',players:'2–10',autosaves:3}));
   add('get_dm_instructions','读取 AI DM 主持指引',z.object({}),async()=>({instructions}));
   add('get_group_context','读取当前授权 QQ 群及活跃世界',z.object({}),async()=>game.groupContext(actor));
   add('create_world','创建世界并自动成为房主',z.object({name:z.string().min(1).max(100),settings:z.record(z.string(),z.unknown()).default({})}),a=>game.createWorld(actor,a.name,a.settings));
@@ -49,7 +49,7 @@ export function createMcpServer(actor: Actor) {
   add('get_session_zero_status','查看成员偏好收集状态',wid,a=>game.sessionStatus(actor,a.worldId));
   add('finalize_world_config','房主确认世界配置',wid.extend({name:z.string().min(1).max(100),settings:z.record(z.string(),z.unknown())}),a=>game.updateWorld(actor,a.worldId,a.name,a.settings));
   add('set_player_ready','设置自己的准备状态',wid.extend({ready:z.boolean()}),a=>game.ready(actor,a.worldId,a.ready));
-  add('start_campaign','房主开团，验证 2–8 人均准备',wid,a=>game.startCampaign(actor,a.worldId));
+  add('start_campaign','房主开团，验证 2–10 人均准备',wid,a=>game.startCampaign(actor,a.worldId));
   add('create_character','为当前可信 QQ 玩家创建主角色',wid.extend({sheet:z.object({name:z.string().min(1).max(80),species:z.string().min(1).max(80),class:z.string().min(1).max(80),subclass:z.string().max(80).default(''),level:z.int().min(1).max(20).default(1),hpMax:z.int().min(1).max(500),ac:z.int().min(1).max(30),speed:z.int().min(0).max(120).default(30),attackBonus:z.int().min(-5).max(20).default(0),initiativeBonus:z.int().min(-10).max(20).default(0),abilities:z.record(z.string(),z.int().min(1).max(30)).default({}),skills:z.array(z.string().max(80)).max(30).default([]),equipment:z.array(z.object({name:z.string().min(1).max(100),quantity:z.int().min(1).max(100)})).max(100).default([]),money:z.object({cp:z.int().min(0).max(1000000).default(0),sp:z.int().min(0).max(1000000).default(0),ep:z.int().min(0).max(1000000).default(0),gp:z.int().min(0).max(1000000).default(0),pp:z.int().min(0).max(1000000).default(0)}).default({cp:0,sp:0,ep:0,gp:0,pp:0}),spells:z.array(z.string().max(100)).max(100).default([]),spellSlots:z.record(z.string(),z.int().min(0).max(20)).default({}),classFeatures:z.array(z.string().max(100)).max(100).default([]),alignment:z.string().max(100).default(''),conditions:z.array(z.string().max(100)).max(30).default([]),background:z.string().max(500).default(''),personality:z.string().max(500).default(''),goal:z.string().max(500).default('')})}),a=>game.createCharacter(actor,a.worldId,a.sheet));
   add('list_characters','列出当前世界角色',wid,a=>game.characters(actor,a.worldId));
   add('get_character','读取角色卡',wid.extend({characterId:id}),a=>game.getCharacter(actor,a.worldId,a.characterId));

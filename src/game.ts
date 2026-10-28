@@ -84,7 +84,7 @@ export async function joinWorld(actor: Actor,id: string) {
     const battle=await db.query('SELECT active FROM combats WHERE world_id=$1',[id]);if(battle.rows[0]?.active)fail('战斗进行中，暂不能加入世界');
     if(old.rows.length){await db.query('UPDATE members SET active=true WHERE world_id=$1 AND user_id=$2',[id,actor.userId]);await event(db,id,'member_rejoined',{userId:actor.userId});return {joined:true,rejoined:true};}
     const count=await db.query('SELECT count(*)::int AS n FROM members WHERE world_id=$1',[id]);
-    if (count.rows[0].n>=8) fail('世界已满，最多 8 名玩家');
+    if (count.rows[0].n>=10) fail('世界已满，最多 10 名玩家');
     if(w.status==='archived')fail('世界已归档，请房主先继续战役');
     await db.query('INSERT INTO members(world_id,user_id) VALUES($1,$2)',[id,actor.userId]);
     await event(db,id,'member_joined',{userId:actor.userId});
@@ -260,7 +260,7 @@ export async function startCampaign(actor: Actor,id: string) {
   return tx(async db=>idempotent(db,id,actor.requestId,async()=>{await lockWorld(db,id);const w=await owner(db,actor,id);
     if(w.status!=='setup') fail('世界不是建团状态');
     const r=await db.query('SELECT count(*)::int AS total,count(*) FILTER (WHERE ready AND active)::int AS ready FROM members WHERE world_id=$1',[id]);
-    if(r.rows[0].total<2||r.rows[0].total>8||r.rows[0].ready!==r.rows[0].total) fail('开团需要 2–8 名成员且所有成员已创建角色并准备');
+    if(r.rows[0].total<2||r.rows[0].total>10||r.rows[0].ready!==r.rows[0].total) fail('开团需要 2–10 名成员且所有成员已创建角色并准备');
     await db.query("UPDATE worlds SET status='active' WHERE id=$1",[id]);await event(db,id,'campaign_started',{});
     return {started:true,players:r.rows[0].total};
   }));

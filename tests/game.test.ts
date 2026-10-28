@@ -9,7 +9,7 @@ import * as combat from '../src/combat.js';
 import * as branches from '../src/branches.js';
 import { createKey, authenticate } from '../src/auth.js';
 
-test('two to eight players, group isolation, idempotent rolls and three autosaves',async()=>{
+test('two to ten players, group isolation, idempotent rolls and three autosaves',async()=>{
   const db=new PGlite();
   const schema=await readFile(new URL('../sql/001_init.sql',import.meta.url),'utf8');
   await db.exec(schema);
@@ -80,13 +80,22 @@ test('two to eight players, group isolation, idempotent rolls and three autosave
     },release:()=>{}});
     assert.equal((await game.createSave(actor('a','retry-save'),id,'auto','重试存档')).version,5);
     (pool as any).connect=async()=>({query:(sql:string,params?:unknown[])=>db.query(sql,params),release:()=>{}});
-    for(let n=3;n<=8;n++){
+    for(let n=3;n<=10;n++){
       assert.deepEqual(await game.joinWorld(actor(`player-${n}`,`join-${n}`),id),{joined:true,count:n});
       await game.createCharacter(actor(`player-${n}`,`char-${n}`),id,{name:`角色 ${n}`,species:'人类',class:n===3?'牧师':'战士',hpMax:10,ac:12,spells:n===3?['cure_wounds']:[]});
     }
-    assert.equal((await game.players(actor('a','list-eight'),id)).length,8);
-    assert.equal((await game.characters(actor('a','characters'),id)).length,8);
-    await assert.rejects(game.joinWorld(actor('ninth','join-nine'),id),/最多 8/);
+    assert.equal((await game.players(actor('a','list-ten'),id)).length,10);
+    assert.equal((await game.characters(actor('a','characters'),id)).length,10);
+    await assert.rejects(game.joinWorld(actor('eleventh','join-eleven'),id),/最多 10/);
+    const tenPlayerWorld=await game.createWorld(actor('a','ten-world'),'十人开团',{});
+    await game.createCharacter(actor('a','ten-char-owner'),tenPlayerWorld.worldId,{name:'房主角色',species:'人类',class:'战士',hpMax:10,ac:12});
+    await game.ready(actor('a','ten-ready-owner'),tenPlayerWorld.worldId,true);
+    for(let n=2;n<=10;n++){
+      await game.joinWorld(actor(`ten-player-${n}`,`ten-join-${n}`),tenPlayerWorld.worldId);
+      await game.createCharacter(actor(`ten-player-${n}`,`ten-char-${n}`),tenPlayerWorld.worldId,{name:`角色 ${n}`,species:'人类',class:'战士',hpMax:10,ac:12});
+      await game.ready(actor(`ten-player-${n}`,`ten-ready-${n}`),tenPlayerWorld.worldId,true);
+    }
+    assert.equal((await game.startCampaign(actor('a','ten-start'),tenPlayerWorld.worldId)).players,10);
     const b=(await game.characters(actor('a','b-char'),id)).find((x:any)=>x.user_id==='b');
     await assert.rejects(game.updateCharacter(actor('a','modify-b'),id,b.id,{goal:'changed'}),/只能修改自己的角色/);
     const manual=await game.createSave(actor('a','manual'),id,'manual','决战前');
@@ -129,7 +138,7 @@ test('two to eight players, group isolation, idempotent rolls and three autosave
       await transfer.uploadImportChunk(actor('a',`upload-${i}`),incoming.importId,i,chunk.base64);
     }
     const imported=await transfer.importWorld(actor('a','final-import'),incoming.importId);
-    assert.equal((await game.characters(actor('a','import-chars'),imported.worldId)).length,8);
+    assert.equal((await game.characters(actor('a','import-chars'),imported.worldId)).length,10);
     const deletion=await game.requestConfirmation(actor('a','delete-request'),id,'world_delete');
     await game.deleteWorld(actor('a','delete'),id,deletion.confirmationToken);
     await assert.rejects(game.getWorld(actor('a','deleted'),id),/不存在/);
