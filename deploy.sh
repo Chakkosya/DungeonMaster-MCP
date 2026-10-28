@@ -30,6 +30,7 @@ ADMIN_PASSWORD=$admin_password
 EOF
   printf '初始管理员密码（仅此处显示）: %s\n' "$admin_password"
 fi
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 docker compose ps
 printf '管理后台: %s/admin/\nMCP Endpoint: %s/mcp\n' "$(sed -n 's/^PUBLIC_URL=//p' .env)" "$(sed -n 's/^PUBLIC_URL=//p' .env)"

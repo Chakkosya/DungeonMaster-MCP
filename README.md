@@ -19,14 +19,14 @@
 
 ## 部署
 
-Linux 服务器安装 Docker、Docker Compose 和 OpenSSL，准备指向服务器的域名，开放 80/443 端口。执行：
+Linux 服务器安装 Docker、Docker Compose 和 OpenSSL，准备指向服务器的域名，开放 80/443 端口。Compose 从 GHCR 拉取公开镜像 `ghcr.io/chakkosya/dungeonmaster-mcp:latest`；可先运行 `docker pull ghcr.io/chakkosya/dungeonmaster-mcp:latest` 检查访问。执行：
 
 ```sh
 chmod +x deploy.sh update.sh backup.sh verify-backup.sh restore.sh logs.sh uninstall.sh
 ./deploy.sh
 ```
 
-脚本会询问域名与管理员用户名，生成数据库密码和初始管理员密码，构建镜像并启动服务。初始密码只在首次部署输出中显示，配置保存在权限受限的 `.env`。后台地址为 `https://域名/admin/`，MCP 地址为 `https://域名/mcp`。填 `localhost` 可在本机测试；Caddy 本地证书需要在测试机信任。健康检查为 `/healthz`，数据库就绪检查为 `/readyz`。
+脚本会询问域名与管理员用户名，生成数据库密码和初始管理员密码，拉取镜像并启动服务。初始密码只在首次部署输出中显示，配置保存在权限受限的 `.env`。后台地址为 `https://域名/admin/`，MCP 地址为 `https://域名/mcp`。填 `localhost` 可在本机测试；Caddy 本地证书需要在测试机信任。健康检查为 `/healthz`，数据库就绪检查为 `/readyz`。
 
 Compose 持久卷保存 PostgreSQL、Worker 备份和 Caddy 证书。`docker compose down` 保留数据。日常命令：
 

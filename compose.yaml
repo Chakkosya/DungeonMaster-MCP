@@ -13,14 +13,14 @@ services:
       interval: 5s
       retries: 20
   migrate:
-    build: .
+    image: ghcr.io/chakkosya/dungeonmaster-mcp:latest
     environment:
       DATABASE_URL: postgres://dnd:${DB_PASSWORD}@db:5432/dnd
     depends_on:
       db: {condition: service_healthy}
     command: ["node","dist/migrate.js"]
   server:
-    build: .
+    image: ghcr.io/chakkosya/dungeonmaster-mcp:latest
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://dnd:${DB_PASSWORD}@db:5432/dnd
@@ -35,7 +35,7 @@ services:
       interval: 10s
       retries: 10
   worker:
-    build: .
+    image: ghcr.io/chakkosya/dungeonmaster-mcp:latest
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://dnd:${DB_PASSWORD}@db:5432/dnd
